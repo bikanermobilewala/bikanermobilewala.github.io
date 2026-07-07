@@ -1,0 +1,604 @@
+import React, { useState } from "react";
+
+const LOGO_URL =
+  "https://i.ibb.co/1Y74N9p9/file-000000003fb0720893467d9180ab50aa.png";
+const PHONE_1 = "+919925231505";
+const PHONE_2 = "+917016293848";
+const WA_1 = "919925231505";
+const ADDRESS = "Surat, Gujarat, India";
+
+const COLOR_SWATCH = {
+  "Deep Blue": "linear-gradient(155deg,#5a6c96 0%,#20304f 55%,#0a1220 100%)",
+  "Black Titanium": "linear-gradient(155deg,#57575a 0%,#232326 55%,#050505 100%)",
+  "Natural Titanium": "linear-gradient(155deg,#eee9db 0%,#c9c2ae 55%,#948d78 100%)",
+  "Desert Titanium": "linear-gradient(155deg,#e3c9a4 0%,#c19f74 55%,#8a6a45 100%)",
+  Silver: "linear-gradient(155deg,#ffffff 0%,#dcdde1 55%,#aeb0b6 100%)",
+  "Cosmic Orange": "linear-gradient(155deg,#f0a765 0%,#c9702f 55%,#8a4416 100%)",
+};
+
+const SPECS = {
+  "iPhone 17 Pro Max": {
+    display: "6.9\" Super Retina XDR, ProMotion 120Hz, Always-On",
+    chip: "A19 Pro chip, 6-core GPU",
+    camera: "48MP Fusion + 48MP Ultra Wide + 48MP Telephoto (5x optical class)",
+    front: "24MP Center Stage front camera",
+    battery: "All-day battery life, fast charging via USB-C",
+    build: "Titanium frame with Ceramic Shield front & back",
+    connectivity: "5G, Wi-Fi 7, USB-C (USB 3, up to 10Gb/s)",
+    desc: "The most capable iPhone in the lineup — a large ProMotion display, the fastest chip Apple has shipped, and a triple-camera system built for serious photography. Ideal if you want zero compromises.",
+  },
+  "iPhone 16 Pro Max": {
+    display: "6.9\" Super Retina XDR, ProMotion 120Hz",
+    chip: "A18 Pro chip",
+    camera: "48MP Fusion + 48MP Ultra Wide + 12MP Telephoto (5x optical)",
+    front: "12MP TrueDepth front camera",
+    battery: "All-day battery life, USB-C fast charging",
+    build: "Titanium frame with Ceramic Shield",
+    connectivity: "5G, Wi-Fi 6E, USB-C, Camera Control & Action button",
+    desc: "Big screen, big battery, pro-grade cameras. A proven flagship with the Camera Control button for quick access to photo tools — great value against the newest generation.",
+  },
+  "iPhone 16 Pro": {
+    display: "6.3\" Super Retina XDR, ProMotion 120Hz",
+    chip: "A18 Pro chip",
+    camera: "48MP Fusion + 48MP Ultra Wide + 12MP Telephoto (5x optical)",
+    front: "12MP TrueDepth front camera",
+    battery: "All-day battery life, USB-C fast charging",
+    build: "Titanium frame with Ceramic Shield",
+    connectivity: "5G, Wi-Fi 6E, USB-C, Camera Control & Action button",
+    desc: "The compact Pro — same titanium build and camera system as the Pro Max, sized for one-hand comfort without giving up performance.",
+  },
+};
+
+const PRODUCTS = [
+  { id: 1, name: "iPhone 17 Pro Max", storage: "1TB", color: "Deep Blue" },
+  { id: 2, name: "iPhone 16 Pro", storage: "256GB", color: "Black Titanium", note: "Black" },
+  { id: 3, name: "iPhone 16 Pro", storage: "128GB", color: "Natural Titanium" },
+  { id: 4, name: "iPhone 16 Pro Max", storage: "256GB", color: "Silver" },
+  { id: 5, name: "iPhone 16 Pro", storage: "256GB", color: "Desert Titanium", note: "Desert" },
+  { id: 7, name: "iPhone 17 Pro Max", storage: "1TB", color: "Black Titanium" },
+  { id: 8, name: "iPhone 17 Pro Max", storage: "256GB", color: "Natural Titanium" },
+  { id: 9, name: "iPhone 17 Pro Max", storage: "256GB", color: "Cosmic Orange" },
+  { id: 10, name: "iPhone 17 Pro Max", storage: "256GB", color: "Silver" },
+  { id: 11, name: "iPhone 17 Pro Max", storage: "256GB", color: "Deep Blue" },
+];
+
+function waLink(product) {
+  const text = product
+    ? `Hi Bikaner Mobilewala, I'm interested in the ${product.name} ${product.storage}${
+        product.note ? " (" + product.note + ")" : ""
+      }. Please share the price and availability.`
+    : "Hi Bikaner Mobilewala, I'd like to know more about your iPhones.";
+  return `https://wa.me/${WA_1}?text=${encodeURIComponent(text)}`;
+}
+
+function PhoneMockup({ color, size = "normal" }) {
+  const h = size === "large" ? 380 : size === "small" ? 170 : 240;
+  const w = h * 0.56;
+  return (
+    <div
+      className="phone-mock"
+      style={{ width: w, height: h, background: COLOR_SWATCH[color] || COLOR_SWATCH["Black Titanium"] }}
+    >
+      <div className="phone-island" />
+      <div className="phone-cam">
+        <span /><span /><span />
+      </div>
+      <div className="phone-sheen" />
+    </div>
+  );
+}
+
+function ProductCard({ p, onOpen }) {
+  return (
+    <div className="pcard" onClick={() => onOpen(p.id)}>
+      <div className="pcard-stage">
+        <PhoneMockup color={p.color} />
+      </div>
+      <div className="pcard-body">
+        <div className="pcard-top">
+          <h3>{p.name}</h3>
+          <span className="pcard-storage">{p.storage}</span>
+        </div>
+        <p className="pcard-color">{p.note || p.color}</p>
+        <div className="pcard-bottom">
+          <span className="price-tag">DM for price</span>
+          <span className="btn-mini">View details →</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function App() {
+  const [page, setPage] = useState("home");
+  const [activeId, setActiveId] = useState(null);
+
+  const openProduct = (id) => {
+    setActiveId(id);
+    setPage("detail");
+    window.scrollTo && window.scrollTo(0, 0);
+  };
+
+  const activeProduct = PRODUCTS.find((p) => p.id === activeId);
+
+  const nav = (
+    <header className="nav">
+      <div className="nav-inner">
+        <button className="brand" onClick={() => setPage("home")}>
+          <img src={LOGO_URL} alt="Bikaner Mobilewala" />
+          <span>Bikaner Mobilewala</span>
+        </button>
+        <nav className="nav-links">
+          {[
+            ["home", "Home"],
+            ["products", "iPhones"],
+            ["about", "About"],
+            ["contact", "Contact"],
+          ].map(([key, label]) => (
+            <button
+              key={key}
+              className={page === key ? "active" : ""}
+              onClick={() => setPage(key)}
+            >
+              {label}
+            </button>
+          ))}
+        </nav>
+        <a className="nav-cta" href={waLink()} target="_blank" rel="noopener noreferrer">
+          WhatsApp Us
+        </a>
+      </div>
+    </header>
+  );
+
+  const footer = (
+    <footer className="footer">
+      <div className="footer-inner">
+        <div className="footer-brand">
+          <img src={LOGO_URL} alt="logo" />
+          <div>
+            <p className="fb-name">Bikaner Mobilewala</p>
+            <p className="fb-tag">Certified Authentic. Premium Apple Experience.</p>
+          </div>
+        </div>
+        <div className="footer-cols">
+          <div>
+            <h4>Contact</h4>
+            <a href={`tel:${PHONE_1}`}>{PHONE_1}</a>
+            <a href={`tel:${PHONE_2}`}>{PHONE_2}</a>
+          </div>
+          <div>
+            <h4>Visit</h4>
+            <p>{ADDRESS}</p>
+            <p>Open 24 × 7</p>
+          </div>
+          <div>
+            <h4>Shop</h4>
+            <button onClick={() => setPage("products")}>All iPhones</button>
+            <button onClick={() => setPage("contact")}>Get in touch</button>
+          </div>
+        </div>
+      </div>
+      <p className="footer-legal">
+        © {new Date().getFullYear()} Bikaner Mobilewala. Not affiliated with Apple Inc. Product renders are illustrative.
+      </p>
+    </footer>
+  );
+
+  return (
+    <div className="site">
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+        :root {
+          --bg: #0b0b0d;
+          --surface: #16161a;
+          --surface-2: #1e1e23;
+          --gold: #d8b25c;
+          --gold-soft: rgba(216,178,92,0.12);
+          --text: #f3efe4;
+          --text-dim: #9b9890;
+          --line: rgba(243,239,228,0.09);
+          --font-display: 'Fraunces', serif;
+          --font-body: 'Manrope', sans-serif;
+          --font-mono: 'JetBrains Mono', monospace;
+        }
+        * { box-sizing: border-box; }
+        .site {
+          font-family: var(--font-body);
+          color: var(--text);
+          background: var(--bg);
+          -webkit-font-smoothing: antialiased;
+        }
+        button { font-family: inherit; cursor: pointer; }
+        h1,h2,h3 { font-family: var(--font-display); }
+
+        /* NAV */
+        .nav {
+          position: sticky; top: 0; z-index: 50;
+          background: rgba(11,11,13,0.72);
+          backdrop-filter: saturate(180%) blur(20px);
+          -webkit-backdrop-filter: saturate(180%) blur(20px);
+          border-bottom: 1px solid var(--line);
+        }
+        .nav-inner {
+          max-width: 1200px; margin: 0 auto;
+          display: flex; align-items: center; justify-content: space-between;
+          padding: 12px 24px;
+        }
+        .brand { display: flex; align-items: center; gap: 10px; background: none; border: none; padding: 0; }
+        .brand img { height: 32px; width: 32px; object-fit: contain; border-radius: 8px; }
+        .brand span { font-family: var(--font-display); font-size: 17px; font-weight: 600; letter-spacing: 0.01em; color: var(--text); }
+        .nav-links { display: flex; gap: 30px; }
+        .nav-links button {
+          background: none; border: none; font-size: 13px; color: var(--text-dim);
+          letter-spacing: 0.03em; text-transform: uppercase; padding: 6px 0;
+          border-bottom: 1px solid transparent;
+        }
+        .nav-links button:hover, .nav-links button.active { color: var(--gold); border-color: var(--gold); }
+        .nav-cta {
+          background: linear-gradient(120deg, var(--gold), #b8903f); color: #16130a; font-size: 13px; font-weight: 700;
+          padding: 9px 18px; border-radius: 4px; text-decoration: none; letter-spacing: 0.02em;
+          transition: filter .2s ease;
+        }
+        .nav-cta:hover { filter: brightness(1.1); }
+        @media (max-width: 720px) { .nav-links { display: none; } }
+
+        /* HERO */
+        .hero {
+          background:
+            radial-gradient(60% 60% at 50% 0%, rgba(216,178,92,0.10) 0%, rgba(216,178,92,0) 60%),
+            var(--bg);
+          color: #fff; text-align: center; padding: 110px 24px 90px;
+          border-bottom: 1px solid var(--line);
+        }
+        .hero .eyebrow-line {
+          display: flex; align-items: center; justify-content: center; gap: 14px; margin-bottom: 28px;
+        }
+        .hero .eyebrow-line span.rule { width: 40px; height: 1px; background: var(--gold); }
+        .hero .eyebrow-line span.txt { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.18em; color: var(--gold); text-transform: uppercase; }
+        .hero img.hero-logo {
+          width: 78px; height: 78px; object-fit: contain; border-radius: 18px;
+          margin-bottom: 26px; box-shadow: 0 0 0 1px var(--gold-soft), 0 20px 50px rgba(216,178,92,0.15);
+        }
+        .hero h1 {
+          font-size: clamp(38px, 6.4vw, 72px); font-weight: 600; letter-spacing: -0.01em;
+          margin: 0 0 16px; line-height: 1.05; font-style: italic;
+        }
+        .hero p.sub {
+          font-family: var(--font-body); font-size: clamp(15px, 2vw, 18px); color: var(--text-dim);
+          max-width: 560px; margin: 0 auto 40px; letter-spacing: 0.01em;
+        }
+        .hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+        .btn-primary {
+          background: linear-gradient(120deg, var(--gold), #b8903f); color: #16130a; border: none; font-size: 15px;
+          padding: 14px 28px; border-radius: 4px; text-decoration: none;
+          font-weight: 700; letter-spacing: 0.02em; transition: filter .2s ease; display: inline-block;
+        }
+        .btn-primary:hover { filter: brightness(1.1); }
+        .btn-secondary {
+          background: transparent; color: var(--text); border: 1px solid var(--line);
+          font-size: 15px; padding: 14px 28px; border-radius: 4px; text-decoration: none;
+          font-weight: 600; letter-spacing: 0.02em; transition: border-color .2s ease, color .2s ease;
+        }
+        .btn-secondary:hover { border-color: var(--gold); color: var(--gold); }
+
+        /* TRUST STRIP */
+        .trust {
+          display: grid; grid-template-columns: repeat(4,1fr);
+          max-width: 1100px; margin: 0 auto; background: var(--surface);
+          border-bottom: 1px solid var(--line);
+        }
+        .trust > div { padding: 28px 20px; text-align: center; border-right: 1px solid var(--line); }
+        .trust > div:last-child { border-right: none; }
+        .trust h5 { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.05em; margin: 0 0 6px; font-weight: 600; color: var(--gold); text-transform: uppercase; }
+        .trust p { font-size: 13px; color: var(--text-dim); margin: 0; }
+        @media (max-width: 720px) {
+          .trust { grid-template-columns: repeat(2,1fr); }
+          .trust > div:nth-child(2) { border-right: none; }
+        }
+
+        /* SECTIONS */
+        .section { max-width: 1200px; margin: 0 auto; padding: 90px 24px; }
+        .section-head { text-align: center; margin-bottom: 54px; }
+        .eyebrow {
+          font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--gold);
+          letter-spacing: 0.18em; text-transform: uppercase; margin: 0 0 14px;
+        }
+        .section-head h2 {
+          font-size: clamp(28px, 4vw, 46px); font-weight: 600; font-style: italic; letter-spacing: -0.01em; margin: 0 0 14px;
+        }
+        .section-head p { color: var(--text-dim); font-size: 16px; max-width: 560px; margin: 0 auto; }
+
+        /* GRID + CARD */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr)); gap: 22px; }
+        .pcard {
+          background: var(--surface); border-radius: 6px; overflow: hidden;
+          display: flex; flex-direction: column; transition: transform .25s ease, border-color .25s ease;
+          border: 1px solid var(--line); cursor: pointer;
+        }
+        .pcard:hover { transform: translateY(-4px); border-color: var(--gold); }
+        .pcard-stage {
+          display: flex; align-items: center; justify-content: center;
+          padding: 34px 0 14px; background: radial-gradient(80% 80% at 50% 30%, var(--surface-2) 0%, var(--surface) 100%);
+        }
+        .phone-mock {
+          position: relative; border-radius: 20%/9%;
+          box-shadow: inset 0 0 0 2px rgba(255,255,255,0.15), 0 14px 30px rgba(0,0,0,0.5);
+          overflow: hidden;
+        }
+        .phone-island { position: absolute; top: 6%; left: 50%; transform: translateX(-50%); width: 30%; height: 4%; background: #000; border-radius: 999px; }
+        .phone-cam {
+          position: absolute; top: 5%; left: 8%; width: 26%; aspect-ratio: 1;
+          background: rgba(0,0,0,0.35); border-radius: 26%;
+          display: grid; grid-template-columns: 1fr 1fr; gap: 8%; padding: 12%;
+        }
+        .phone-cam span { background: #0d0d0d; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(255,255,255,0.15); }
+        .phone-sheen { position: absolute; inset: 0; background: linear-gradient(120deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 35%); }
+        .pcard-body { padding: 18px 20px 22px; border-top: 1px solid var(--line); }
+        .pcard-top { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+        .pcard-top h3 { font-size: 16px; font-weight: 600; margin: 0; font-style: normal; }
+        .pcard-storage {
+          font-family: var(--font-mono); font-size: 11px; font-weight: 600; color: var(--gold);
+          background: var(--gold-soft); padding: 3px 9px; border-radius: 3px; white-space: nowrap;
+        }
+        .pcard-color { font-size: 13px; color: var(--text-dim); margin: 6px 0 18px; }
+        .pcard-bottom { display: flex; align-items: center; justify-content: space-between; }
+        .price-tag { font-family: var(--font-mono); font-size: 12px; font-weight: 600; color: var(--text-dim); letter-spacing: 0.03em; }
+        .btn-mini { font-size: 12px; font-weight: 600; color: var(--gold); }
+
+        .view-all-wrap { text-align: center; margin-top: 48px; }
+
+        /* CTA BAND */
+        .cta-band { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); text-align: center; padding: 84px 24px; }
+        .cta-band h2 { font-size: clamp(24px,4vw,38px); margin: 0 0 12px; font-weight: 600; font-style: italic; }
+        .cta-band p { color: var(--text-dim); margin: 0 0 30px; font-size: 16px; }
+
+        /* ABOUT */
+        .about-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
+        .about-copy h2 { font-size: clamp(26px,4vw,42px); font-weight: 600; font-style: italic; letter-spacing: -0.01em; margin: 0 0 18px; }
+        .about-copy p { color: var(--text-dim); font-size: 16px; line-height: 1.7; margin: 0 0 16px; }
+        .about-list { list-style: none; padding: 0; margin: 26px 0 0; display: grid; gap: 14px; }
+        .about-list li { display: flex; gap: 12px; font-size: 14px; color: var(--text); }
+        .about-list li .dot {
+          width: 20px; height: 20px; border-radius: 3px; background: var(--gold-soft); color: var(--gold);
+          display: flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0; margin-top: 1px; font-weight: 700;
+        }
+        .about-stage {
+          background: radial-gradient(80% 80% at 50% 30%, var(--surface-2) 0%, var(--bg) 100%);
+          border: 1px solid var(--line); border-radius: 10px; display: flex; align-items: center; justify-content: center;
+          padding: 50px; gap: 18px;
+        }
+        @media (max-width: 860px) { .about-wrap { grid-template-columns: 1fr; } }
+
+        /* CONTACT */
+        .contact-wrap { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 40px; }
+        .contact-card { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 40px; }
+        .contact-card h3 { font-size: 22px; font-weight: 600; font-style: italic; margin: 0 0 20px; }
+        .contact-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; border-top: 1px solid var(--line); }
+        .contact-row:first-of-type { border-top: none; }
+        .contact-row .label { font-family: var(--font-mono); font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+        .contact-row .value { font-size: 15px; font-weight: 500; }
+        .contact-row a { color: var(--gold); text-decoration: none; font-weight: 600; }
+        .contact-panel {
+          background: linear-gradient(160deg, var(--surface-2), var(--bg)); border: 1px solid var(--gold-soft);
+          border-radius: 10px; padding: 40px; display: flex; flex-direction: column; justify-content: center; text-align: center;
+        }
+        .contact-panel h3 { font-size: 22px; margin: 0 0 10px; font-weight: 600; font-style: italic; }
+        .contact-panel p { color: var(--text-dim); margin: 0 0 24px; font-size: 14px; }
+        @media (max-width: 860px) { .contact-wrap { grid-template-columns: 1fr; } }
+
+        /* PRODUCT DETAIL */
+        .detail { max-width: 1100px; margin: 0 auto; padding: 50px 24px 100px; }
+        .back-link { background: none; border: none; color: var(--text-dim); font-size: 13px; margin-bottom: 34px; letter-spacing: 0.02em; }
+        .back-link:hover { color: var(--gold); }
+        .detail-wrap { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 60px; }
+        .detail-stage {
+          background: radial-gradient(80% 80% at 50% 30%, var(--surface-2) 0%, var(--bg) 100%);
+          border: 1px solid var(--line); border-radius: 12px; display: flex; align-items: center; justify-content: center; padding: 50px;
+          position: sticky; top: 90px; height: fit-content;
+        }
+        .detail-eyebrow { font-family: var(--font-mono); font-size: 12px; color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase; margin: 0 0 10px; }
+        .detail-title { font-size: clamp(30px,4vw,44px); font-weight: 600; font-style: italic; margin: 0 0 10px; letter-spacing: -0.01em; }
+        .detail-sub { font-size: 15px; color: var(--text-dim); margin: 0 0 26px; }
+        .detail-price-row {
+          display: flex; align-items: center; justify-content: space-between; background: var(--surface);
+          border: 1px solid var(--line); border-radius: 8px; padding: 18px 22px; margin-bottom: 30px;
+        }
+        .detail-price-row .ptag { font-family: var(--font-mono); font-size: 15px; font-weight: 600; letter-spacing: 0.02em; }
+        .detail-price-row .psub { font-size: 12px; color: var(--text-dim); margin-top: 3px; }
+        .detail-desc { font-size: 15px; line-height: 1.75; color: var(--text-dim); margin: 0 0 34px; }
+        .spec-ticket { border: 1px dashed var(--line); border-radius: 8px; padding: 0; }
+        .spec-row {
+          display: grid; grid-template-columns: 140px 1fr; gap: 20px; padding: 16px 22px;
+          border-bottom: 1px solid var(--line); align-items: baseline;
+        }
+        .spec-row:last-child { border-bottom: none; }
+        .spec-row .k { font-family: var(--font-mono); font-size: 11px; color: var(--gold); text-transform: uppercase; letter-spacing: 0.08em; }
+        .spec-row .v { font-size: 14px; color: var(--text); line-height: 1.6; }
+        .detail-cta { margin-top: 34px; display: flex; gap: 14px; flex-wrap: wrap; }
+        @media (max-width: 860px) {
+          .detail-wrap { grid-template-columns: 1fr; }
+          .detail-stage { position: static; }
+          .spec-row { grid-template-columns: 110px 1fr; }
+        }
+
+        /* FOOTER */
+        .footer { background: var(--surface); padding: 60px 24px 24px; border-top: 1px solid var(--line); }
+        .footer-inner {
+          max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between;
+          flex-wrap: wrap; gap: 40px; padding-bottom: 36px; border-bottom: 1px solid var(--line);
+        }
+        .footer-brand { display: flex; gap: 12px; align-items: center; }
+        .footer-brand img { width: 40px; height: 40px; border-radius: 9px; object-fit: contain; }
+        .fb-name { font-family: var(--font-display); font-weight: 600; font-size: 16px; margin: 0; font-style: italic; }
+        .fb-tag { font-size: 12px; color: var(--text-dim); margin: 2px 0 0; }
+        .footer-cols { display: flex; gap: 60px; flex-wrap: wrap; }
+        .footer-cols h4 { font-family: var(--font-mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--gold); margin: 0 0 12px; }
+        .footer-cols a, .footer-cols button, .footer-cols p {
+          display: block; background: none; border: none; text-align: left; padding: 0;
+          font-size: 13px; color: var(--text-dim); text-decoration: none; margin: 0 0 8px;
+        }
+        .footer-cols a:hover, .footer-cols button:hover { color: var(--gold); }
+        .footer-legal { max-width: 1200px; margin: 20px auto 0; font-size: 12px; color: var(--text-dim); }
+      `}</style>
+
+      {nav}
+
+      {page === "home" && (
+        <>
+          <section className="hero">
+            <div className="eyebrow-line">
+              <span className="rule" />
+              <span className="txt">Surat, Gujarat</span>
+              <span className="rule" />
+            </div>
+            <img className="hero-logo" src={LOGO_URL} alt="Bikaner Mobilewala" />
+            <h1>Bikaner Mobilewala</h1>
+            <p className="sub">Certified authentic. Every unit verified, every customer trusted — a premium Apple buying experience, 24 hours a day.</p>
+            <div className="hero-ctas">
+              <button className="btn-primary" onClick={() => setPage("products")}>Explore the Collection</button>
+              <a className="btn-secondary" href={waLink()} target="_blank" rel="noopener noreferrer">Chat on WhatsApp</a>
+            </div>
+          </section>
+
+          <div className="trust">
+            <div><h5>Certified</h5><p>100% genuine Apple devices</p></div>
+            <div><h5>Verified</h5><p>Every unit checked before sale</p></div>
+            <div><h5>Local</h5><p>Trusted store in Surat</p></div>
+            <div><h5>Always Open</h5><p>24 × 7 support</p></div>
+          </div>
+
+          <section className="section">
+            <div className="section-head">
+              <p className="eyebrow">Featured</p>
+              <h2>The current collection</h2>
+              <p>A glimpse of what's in store right now.</p>
+            </div>
+            <div className="grid">
+              {PRODUCTS.slice(0, 4).map((p) => (
+                <ProductCard key={p.id} p={p} onOpen={openProduct} />
+              ))}
+            </div>
+            <div className="view-all-wrap">
+              <button className="btn-primary" onClick={() => setPage("products")}>View all iPhones</button>
+            </div>
+          </section>
+
+          <div className="cta-band">
+            <h2>Got a question about a model?</h2>
+            <p>We reply fast on WhatsApp — no waiting, no bots.</p>
+            <a className="btn-primary" href={waLink()} target="_blank" rel="noopener noreferrer">Message us now</a>
+          </div>
+        </>
+      )}
+
+      {page === "products" && (
+        <section className="section" style={{ paddingTop: 60 }}>
+          <div className="section-head">
+            <p className="eyebrow">Shop</p>
+            <h2>The full iPhone lineup</h2>
+            <p>All units certified authentic. Tap a phone for full details, or ask us the price on WhatsApp.</p>
+          </div>
+          <div className="grid">
+            {PRODUCTS.map((p) => (
+              <ProductCard key={p.id} p={p} onOpen={openProduct} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {page === "detail" && activeProduct && (
+        <div className="detail">
+          <button className="back-link" onClick={() => setPage("products")}>← Back to all iPhones</button>
+          <div className="detail-wrap">
+            <div className="detail-stage">
+              <PhoneMockup color={activeProduct.color} size="large" />
+            </div>
+            <div>
+              <p className="detail-eyebrow">{activeProduct.storage} · {activeProduct.note || activeProduct.color}</p>
+              <h1 className="detail-title">{activeProduct.name}</h1>
+              <p className="detail-sub">{SPECS[activeProduct.name]?.desc}</p>
+
+              <div className="detail-price-row">
+                <div>
+                  <div className="ptag">DM for price</div>
+                  <div className="psub">Certified authentic · Verified unit</div>
+                </div>
+                <a className="btn-mini" style={{ fontSize: 13 }} href={waLink(activeProduct)} target="_blank" rel="noopener noreferrer">
+                  Enquire →
+                </a>
+              </div>
+
+              <div className="spec-ticket">
+                <div className="spec-row"><span className="k">Storage</span><span className="v">{activeProduct.storage}</span></div>
+                <div className="spec-row"><span className="k">Color</span><span className="v">{activeProduct.note || activeProduct.color}</span></div>
+                <div className="spec-row"><span className="k">Display</span><span className="v">{SPECS[activeProduct.name]?.display}</span></div>
+                <div className="spec-row"><span className="k">Chip</span><span className="v">{SPECS[activeProduct.name]?.chip}</span></div>
+                <div className="spec-row"><span className="k">Camera</span><span className="v">{SPECS[activeProduct.name]?.camera}</span></div>
+                <div className="spec-row"><span className="k">Front camera</span><span className="v">{SPECS[activeProduct.name]?.front}</span></div>
+                <div className="spec-row"><span className="k">Battery</span><span className="v">{SPECS[activeProduct.name]?.battery}</span></div>
+                <div className="spec-row"><span className="k">Build</span><span className="v">{SPECS[activeProduct.name]?.build}</span></div>
+                <div className="spec-row"><span className="k">Connectivity</span><span className="v">{SPECS[activeProduct.name]?.connectivity}</span></div>
+              </div>
+
+              <div className="detail-cta">
+                <a className="btn-primary" href={waLink(activeProduct)} target="_blank" rel="noopener noreferrer">Enquire on WhatsApp</a>
+                <a className="btn-secondary" href={`tel:${PHONE_1}`}>Call to ask</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {page === "about" && (
+        <section className="section" style={{ paddingTop: 60 }}>
+          <div className="about-wrap">
+            <div className="about-copy">
+              <p className="eyebrow">About us</p>
+              <h2>Surat's trusted name for genuine iPhones</h2>
+              <p>Bikaner Mobilewala has built its reputation on one simple promise: every iPhone we sell is certified authentic. No compromises, no shortcuts — just genuine Apple devices at fair prices.</p>
+              <p>Based in Surat, Gujarat, we're available around the clock to help you find the right iPhone, answer your questions, and make sure you walk away confident in your purchase.</p>
+              <ul className="about-list">
+                <li><span className="dot">✓</span> 100% certified authentic devices</li>
+                <li><span className="dot">✓</span> Transparent, honest pricing on request</li>
+                <li><span className="dot">✓</span> Friendly, fast support — 24 × 7</li>
+                <li><span className="dot">✓</span> Wide range: latest to previous-gen Pro models</li>
+              </ul>
+            </div>
+            <div className="about-stage">
+              <PhoneMockup color="Deep Blue" size="large" />
+              <PhoneMockup color="Natural Titanium" size="small" />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {page === "contact" && (
+        <section className="section" style={{ paddingTop: 60 }}>
+          <div className="section-head">
+            <p className="eyebrow">Contact</p>
+            <h2>Let's talk iPhones</h2>
+            <p>Reach out by call or WhatsApp — we're open 24 × 7.</p>
+          </div>
+          <div className="contact-wrap">
+            <div className="contact-card">
+              <h3>Store details</h3>
+              <div className="contact-row"><span className="label">Phone</span><a href={`tel:${PHONE_1}`}>{PHONE_1}</a></div>
+              <div className="contact-row"><span className="label">Phone (alt.)</span><a href={`tel:${PHONE_2}`}>{PHONE_2}</a></div>
+              <div className="contact-row"><span className="label">Address</span><span className="value">{ADDRESS}</span></div>
+              <div className="contact-row"><span className="label">Hours</span><span className="value">Open 24 × 7</span></div>
+            </div>
+            <div className="contact-panel">
+              <h3>Prefer WhatsApp?</h3>
+              <p>Send us a message and we'll get back within minutes.</p>
+              <a className="btn-primary" href={waLink()} target="_blank" rel="noopener noreferrer">Start chat</a>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {footer}
+    </div>
+  );
+}
